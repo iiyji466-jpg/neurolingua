@@ -1,0 +1,170 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Users ─────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  name         String?
+  image        String?
+  provider     String   @default("email")
+  providerId   String?
+  refreshToken String?
+  plan         Plan     @default(FREE)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  profile      UserProfile?
+  progress     LearningProgress[]
+  memories     AIMemory[]
+  subscription Subscription?
+  magicLinks   MagicLink[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String? @db.Text
+  refreshToken      String? @db.Text
+  expiresAt         Int?
+  tokenType         String?
+  scope             String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id               String   @id @default(cuid())
+  userId           String
+  refreshTokenHash String
+  deviceInfo       String?
+  ipAddress        String?
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model MagicLink {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@map("magic_links")
+}
+
+// ── Profile ───────────────────────────────────────────────
+
+model UserProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  nativeLanguage String   @default("en")
+  targetLanguage String   @default("en")
+  uiLanguage     String   @default("en")
+  level          CEFRLevel @default(A1)
+  goals          String[]
+  dailyGoalMin   Int      @default(15)
+  interests      String[]
+  streak         Int      @default(0)
+  lastActiveAt   DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// ── Learning ──────────────────────────────────────────────
+
+model LearningProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  language    String
+  skill       Skill
+  percentage  Float    @default(0)
+  xp          Int      @default(0)
+  lastUpdated DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, language, skill])
+  @@map("learning_progress")
+}
+
+// ── AI Memory ─────────────────────────────────────────────
+
+model AIMemory {
+  id              String     @id @default(cuid())
+  userId          String
+  language        String
+  type            MemoryType
+  content         String     @db.Text
+  importanceScore Float      @default(0.5)
+  embedding       Float[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, language])
+  @@map("ai_memories")
+}
+
+// ── Subscription ──────────────────────────────────────────
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  plan                 Plan      @default(FREE)
+  status               SubStatus @default(ACTIVE)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  stripePriceId        String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+// ── Enums ─────────────────────────────────────────────────
+
+enum Plan       { FREE PRO ULTRA }
+enum SubStatus  { ACTIVE PAST_DUE CANCELED TRIALING }
+enum CEFRLevel  { A1 A2 B1 B2 C1 C2 }
+enum MemoryType { MISTAKE PREFERENCE FACT ACHIEVEMENT }
+enum Skill      { SPEAKING LISTENING READING WRITING VOCABULARY GRAMMAR PRONUNCIATION }
