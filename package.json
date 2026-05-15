@@ -1,6 +1,7 @@
 {
   "name": "neurolingua-ai",
   "version": "0.1.0",
+  "packageManager": "yarn@1.22.19",
   "private": true,
   "workspaces": [
     "apps/*",
