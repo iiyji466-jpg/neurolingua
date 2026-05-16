@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npx @nestjs/cli start --watch",
-    "build": "prisma generate && npx @nestjs/cli build",
+    "build": "npx prisma generate && npx @nestjs/cli build",
     "start": "node dist/main",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
