@@ -23,10 +23,10 @@ export class AIOrchestrator {
   private readonly openai: OpenAI;
 
   constructor(private config: ConfigService) {
-    this.openai = new OpenAI({ 
-  apiKey: this.config.get("GROQ_API_KEY"),
-  baseURL: "https://api.groq.com/openai/v1"
-});
+    this.openai = new OpenAI({
+      apiKey: this.config.get("GROQ_API_KEY"),
+      baseURL: "https://api.groq.com/openai/v1"
+    });
   }
 
   private buildSystemPrompt(ctx: AIContext): string {
@@ -69,7 +69,7 @@ You are NOT a chatbot. You are a living tutor that evolves with this specific st
     const systemPrompt = this.buildSystemPrompt(ctx);
 
     const stream = await this.openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "llama-3.3-70b-versatile",
       stream: true,
       temperature: 0.7,
       max_tokens: 500,
@@ -84,7 +84,7 @@ You are NOT a chatbot. You are a living tutor that evolves with this specific st
 
   async complete(prompt: string, ctx: AIContext): Promise<string> {
     const response = await this.openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "llama-3.3-70b-versatile",
       temperature: 0.5,
       max_tokens: 300,
       messages: [
@@ -110,10 +110,9 @@ Only extract meaningful insights. Return [] if nothing notable. Return ONLY vali
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "llama-3.3-70b-versatile",
         temperature: 0.1,
         max_tokens: 200,
-        response_format: { type: "json_object" },
         messages: [{ role: "user", content: prompt }],
       });
 
@@ -138,10 +137,9 @@ Rate pronunciation 0-100 and give feedback. Return JSON:
 { "score": number, "feedback": "2 sentence feedback", "nativeIPA": "correct IPA", "userIPA": "estimated user IPA" }`;
 
     const response = await this.openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "llama-3.3-70b-versatile",
       temperature: 0.2,
       max_tokens: 150,
-      response_format: { type: "json_object" },
       messages: [{ role: "user", content: prompt }],
     });
 
