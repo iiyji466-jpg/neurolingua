@@ -23,7 +23,10 @@ export class AIOrchestrator {
   private readonly openai: OpenAI;
 
   constructor(private config: ConfigService) {
-    this.openai = new OpenAI({ apiKey: this.config.get("OPENAI_API_KEY") });
+    this.openai = new OpenAI({ 
+  apiKey: this.config.get("GROQ_API_KEY"),
+  baseURL: "https://api.groq.com/openai/v1"
+});
   }
 
   private buildSystemPrompt(ctx: AIContext): string {
