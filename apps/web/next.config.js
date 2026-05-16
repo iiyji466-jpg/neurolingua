@@ -2,9 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@neurolingua/ui", "@neurolingua/types"],
-  env: {
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
