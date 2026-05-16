@@ -1,6 +1,6 @@
 # NeuroLingua AI 🧠
 
-> The world's most advanced AI language،،،
+> The world's most advanced AI language،،،،
  acquisition platform.
 > A living AI tutor that evolves with the user — not a course, not a chatbot.
 
