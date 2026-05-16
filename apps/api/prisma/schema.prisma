@@ -9,8 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── Users ─────────────────────────────────────────────────
-
 model User {
   id           String   @id @default(cuid())
   email        String?  @unique
@@ -82,29 +80,25 @@ model MagicLink {
   @@map("magic_links")
 }
 
-// ── Profile ───────────────────────────────────────────────
-
 model UserProfile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  nativeLanguage String   @default("en")
-  targetLanguage String   @default("en")
-  uiLanguage     String   @default("en")
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  nativeLanguage String    @default("en")
+  targetLanguage String    @default("en")
+  uiLanguage     String    @default("en")
   level          CEFRLevel @default(A1)
   goals          String[]
-  dailyGoalMin   Int      @default(15)
+  dailyGoalMin   Int       @default(15)
   interests      String[]
-  streak         Int      @default(0)
-  lastActiveAt   DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  streak         Int       @default(0)
+  lastActiveAt   DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_profiles")
 }
-
-// ── Learning ──────────────────────────────────────────────
 
 model LearningProgress {
   id          String   @id @default(cuid())
@@ -120,8 +114,6 @@ model LearningProgress {
   @@unique([userId, language, skill])
   @@map("learning_progress")
 }
-
-// ── AI Memory ─────────────────────────────────────────────
 
 model AIMemory {
   id              String     @id @default(cuid())
@@ -139,8 +131,6 @@ model AIMemory {
   @@index([userId, language])
   @@map("ai_memories")
 }
-
-// ── Subscription ──────────────────────────────────────────
 
 model Subscription {
   id                   String    @id @default(cuid())
@@ -161,10 +151,41 @@ model Subscription {
   @@map("subscriptions")
 }
 
-// ── Enums ─────────────────────────────────────────────────
+enum Plan {
+  FREE
+  PRO
+  ULTRA
+}
 
-enum Plan       { FREE PRO ULTRA }
-enum SubStatus  { ACTIVE PAST_DUE CANCELED TRIALING }
-enum CEFRLevel  { A1 A2 B1 B2 C1 C2 }
-enum MemoryType { MISTAKE PREFERENCE FACT ACHIEVEMENT }
-enum Skill      { SPEAKING LISTENING READING WRITING VOCABULARY GRAMMAR PRONUNCIATION }
+enum SubStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+enum CEFRLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum MemoryType {
+  MISTAKE
+  PREFERENCE
+  FACT
+  ACHIEVEMENT
+}
+
+enum Skill {
+  SPEAKING
+  LISTENING
+  READING
+  WRITING
+  VOCABULARY
+  GRAMMAR
+  PRONUNCIATION
+}
